@@ -2,6 +2,18 @@
 
 LangGraph agent that takes a freshly signed B2B partner from contract to operational in under 2 hours. Zero manual handoffs between sales, ops, and support.
 
+![End-to-end onboarding run](docs/media/cli-run.gif)
+
+A single closed-won HubSpot deal becomes: a provisioned M365 mailbox + SharePoint site + Planner board, a Zendesk org with the right SLA tier, an internal portal account, an AI-generated welcome email sequence + kickoff agenda + 30-day readiness checklist, and a co-branded PDF welcome packet — uploaded to both the portal and SharePoint, with a summary note posted back to the deal.
+
+### Co-branded welcome packet (auto-generated per partner)
+
+<p>
+  <img src="docs/media/welcome-packet-1.png" alt="Welcome packet cover" width="33%">
+  <img src="docs/media/welcome-packet-2.png" alt="Welcome packet content with checklist" width="33%">
+  <img src="docs/media/welcome-packet-3.png" alt="Welcome packet quick links" width="33%">
+</p>
+
 ## What it does
 
 When a HubSpot deal flips to **Closed Won**, the agent:
