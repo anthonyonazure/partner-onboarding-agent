@@ -1,6 +1,6 @@
 # partner-onboarding-agent
 
-LangGraph agent that takes a freshly signed B2B partner from contract to operational in under 7 days. Zero manual handoffs between sales, ops, and support.
+LangGraph agent that takes a freshly signed B2B partner from contract to operational in under 2 hours. Zero manual handoffs between sales, ops, and support.
 
 ## What it does
 
