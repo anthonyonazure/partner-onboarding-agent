@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ partner_name }} — Partner Welcome Packet</title>
+<style>
+  @page { size: Letter; margin: 22mm 18mm; @bottom-center { content: counter(page) " / " counter(pages); color: #888; font-size: 9pt; } }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 10.5pt; line-height: 1.5; }
+  .cover { text-align: center; padding-top: 60mm; }
+  .cover h1 { font-size: 28pt; margin: 0 0 8mm; letter-spacing: -0.5px; }
+  .cover h2 { font-size: 13pt; font-weight: 400; color: #555; margin: 0; }
+  .logos { display: flex; justify-content: center; gap: 30mm; margin-bottom: 20mm; align-items: center; }
+  .logos img { max-height: 24mm; max-width: 60mm; }
+  .brandline { display: inline-block; height: 24mm; line-height: 24mm; font-weight: 700; font-size: 14pt; color: #0b3d91; }
+  .brandline.partner { color: #c0392b; }
+  .pagebreak { page-break-after: always; }
+  h2.section { font-size: 16pt; border-bottom: 2px solid #0b3d91; padding-bottom: 4px; margin-top: 14mm; }
+  .meta { background: #f4f6f9; padding: 6mm 8mm; border-left: 4px solid #0b3d91; margin: 8mm 0; }
+  .meta dt { font-weight: 600; color: #555; }
+  .meta dd { margin: 0 0 4mm; }
+  ul.checklist { padding-left: 0; list-style: none; }
+  ul.checklist li { padding: 4px 0 4px 22px; position: relative; }
+  ul.checklist li::before { content: "☐"; position: absolute; left: 0; font-size: 14pt; color: #0b3d91; }
+  pre.agenda { white-space: pre-wrap; background: #fafafa; padding: 6mm; border-radius: 4px; font-family: inherit; font-size: 10pt; }
+  .links a { color: #0b3d91; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="logos">
+    <span class="brandline">CYBER&nbsp;CO.</span>
+    <span style="font-size: 24pt; color: #ccc;">×</span>
+    {% if partner_logo_url %}
+      <img src="{{ partner_logo_url }}" alt="{{ partner_name }} logo">
+    {% else %}
+      <span class="brandline partner">{{ partner_name|upper }}</span>
+    {% endif %}
+  </div>
+  <h1>Welcome, {{ partner_name }}</h1>
+  <h2>Your {{ tier }}-tier partner onboarding packet</h2>
+</section>
+
+<div class="pagebreak"></div>
+
+<h2 class="section">Engagement Summary</h2>
+<dl class="meta">
+  <dt>Primary Contact</dt><dd>{{ primary_contact_name }}</dd>
+  <dt>Tier</dt><dd>{{ tier }}</dd>
+  <dt>Services in Scope</dt>
+  <dd>
+    {% for s in services %}{{ s }}{% if not loop.last %}, {% endif %}{% endfor %}
+    {% if not services %}—{% endif %}
+  </dd>
+</dl>
+
+<h2 class="section">Kickoff Call Agenda</h2>
+<pre class="agenda">{{ kickoff_agenda_md }}</pre>
+
+<h2 class="section">30-Day Readiness Checklist</h2>
+<ul class="checklist">
+  {% for item in readiness_checklist %}<li>{{ item }}</li>{% endfor %}
+</ul>
+
+<h2 class="section">Quick Links</h2>
+<p class="links">
+  <strong>Shared workspace:</strong><br>
+  <a href="{{ sharepoint_url }}">{{ sharepoint_url }}</a><br><br>
+  <strong>Partner intake form (please complete in week 1):</strong><br>
+  <a href="{{ intake_form_url }}">{{ intake_form_url }}</a>
+</p>
+
+</body>
+</html>
