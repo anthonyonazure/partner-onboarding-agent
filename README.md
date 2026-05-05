@@ -14,6 +14,12 @@ A single closed-won HubSpot deal becomes: a provisioned M365 mailbox + SharePoin
   <img src="docs/media/welcome-packet-3.png" alt="Welcome packet quick links" width="33%">
 </p>
 
+### Verified against a real Microsoft 365 tenant
+
+Live readback from the production tenant, after the agent ran end-to-end with `B2B_USE_MOCKS=false`. Mailbox, M365 group, SharePoint site, Planner board (with all four buckets) and the uploaded PDF are all real Graph resources, addressable by their IDs in the screenshot below.
+
+![Live readback from a real M365 tenant](docs/media/m365-readback-real-tenant.png)
+
 ## What it does
 
 When a HubSpot deal flips to **Closed Won**, the agent:
