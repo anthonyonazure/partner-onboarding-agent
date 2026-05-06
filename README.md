@@ -1,5 +1,10 @@
 # partner-onboarding-agent
 
+[![tests](https://github.com/anthonyonazure/partner-onboarding-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/anthonyonazure/partner-onboarding-agent/actions/workflows/tests.yml)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
+[![LangGraph](https://img.shields.io/badge/orchestrator-LangGraph-orange.svg)](https://github.com/langchain-ai/langgraph)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 LangGraph agent that takes a freshly signed B2B partner from contract to operational in under 2 hours. Zero manual handoffs between sales, ops, and support.
 
 ![End-to-end onboarding run](docs/media/cli-run.gif)
