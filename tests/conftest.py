@@ -44,10 +44,9 @@ class _UvicornInThread:
 
 @pytest.fixture(scope="session")
 def mock_portal_url():
-    from mock_portal.main import app
-
     # Reset module-level dicts between sessions for cleanliness
     from mock_portal import main as mp
+    from mock_portal.main import app
 
     mp._ACCOUNTS.clear()
     mp._ASSETS.clear()

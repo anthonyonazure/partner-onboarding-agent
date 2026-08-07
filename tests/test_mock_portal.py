@@ -22,7 +22,9 @@ async def test_asset_upload_roundtrip(mock_portal_url):
             )
         ).json()
         files = {"file": ("packet.pdf", b"%PDF-fake", "application/pdf")}
-        r = (await c.post(f"/v1/accounts/{acct['account_id']}/assets", files=files)).json()
+        r = (
+            await c.post(f"/v1/accounts/{acct['account_id']}/assets", files=files)
+        ).json()
         assert r["bytes"] == len(b"%PDF-fake")
         # Asset is retrievable
         get = await c.get(f"/assets/{acct['account_id']}/packet.pdf")

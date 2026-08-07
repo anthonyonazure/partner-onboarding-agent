@@ -10,21 +10,39 @@ observability by setting two env vars.
 
 from __future__ import annotations
 
-import functools
 import os
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, Literal, TypeVar
 
 F = TypeVar("F", bound=Callable[..., Any])
 
+# The observation kinds Langfuse's @observe accepts. Spelling it out here keeps
+# the no-op branch and the real branch agreeing on one signature.
+ObservationType = Literal[
+    "generation",
+    "embedding",
+    "span",
+    "agent",
+    "tool",
+    "chain",
+    "retriever",
+    "evaluator",
+    "guardrail",
+]
+
 
 def _enabled() -> bool:
-    return bool(os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get("LANGFUSE_SECRET_KEY"))
+    return bool(
+        os.environ.get("LANGFUSE_PUBLIC_KEY") and os.environ.get("LANGFUSE_SECRET_KEY")
+    )
 
 
 if _enabled():
     from langfuse import observe  # type: ignore[import-not-found]
 
-    def traced(name: str | None = None, as_type: str | None = None) -> Callable[[F], F]:
+    def traced(
+        name: str | None = None, as_type: ObservationType | None = None
+    ) -> Callable[[F], F]:
         """Wrap an async function so each call becomes a Langfuse span.
 
         as_type='generation' marks LLM calls (gets token-cost UI in Langfuse).
@@ -42,7 +60,9 @@ if _enabled():
 
 else:
 
-    def traced(name: str | None = None, as_type: str | None = None) -> Callable[[F], F]:
+    def traced(
+        name: str | None = None, as_type: ObservationType | None = None
+    ) -> Callable[[F], F]:
         def decorator(fn: F) -> F:
             return fn
 

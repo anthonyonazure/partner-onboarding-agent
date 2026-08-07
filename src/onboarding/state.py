@@ -5,6 +5,8 @@ from __future__ import annotations
 from operator import add
 from typing import Annotated, Any, TypedDict
 
+from b2b_toolkit.models import PartnerTier
+
 
 class OnboardingState(TypedDict, total=False):
     # Inputs
@@ -18,7 +20,7 @@ class OnboardingState(TypedDict, total=False):
     partner_logo_url: str | None
     primary_contact_email: str
     primary_contact_name: str
-    tier: str
+    tier: PartnerTier
     region: str
     services_purchased: list[str]
     contract_signed_at: str

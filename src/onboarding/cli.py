@@ -51,14 +51,14 @@ async def _run(deal_id: str, save_log: bool) -> None:
 
     console.rule("[bold cyan]Result[/]")
     table = Table(show_header=False, box=None)
-    table.add_row("Partner",       str(final_state.get("partner_name")))
-    table.add_row("Tier",          str(final_state.get("tier")))
-    table.add_row("M365 mailbox",  str(final_state.get("mailbox_upn")))
-    table.add_row("SharePoint",    str(final_state.get("sharepoint_url")))
-    table.add_row("Zendesk org",   str(final_state.get("zendesk_org_id")))
-    table.add_row("Portal acct",   str(final_state.get("portal_account_id")))
-    table.add_row("Welcome PDF",   str(final_state.get("pdf_packet_path")))
-    table.add_row("Asset URL",     str(final_state.get("pdf_packet_url")))
+    table.add_row("Partner", str(final_state.get("partner_name")))
+    table.add_row("Tier", str(final_state.get("tier")))
+    table.add_row("M365 mailbox", str(final_state.get("mailbox_upn")))
+    table.add_row("SharePoint", str(final_state.get("sharepoint_url")))
+    table.add_row("Zendesk org", str(final_state.get("zendesk_org_id")))
+    table.add_row("Portal acct", str(final_state.get("portal_account_id")))
+    table.add_row("Welcome PDF", str(final_state.get("pdf_packet_path")))
+    table.add_row("Asset URL", str(final_state.get("pdf_packet_url")))
     console.print(table)
 
     if save_log:

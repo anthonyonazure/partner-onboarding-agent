@@ -11,6 +11,7 @@ import os
 from dataclasses import dataclass
 
 from anthropic import AsyncAnthropic
+from anthropic.types import TextBlock
 
 from onboarding.tracing import traced
 
@@ -75,12 +76,16 @@ async def generate_content_bundle(
         max_tokens=4096,
         messages=[{"role": "user", "content": prompt}],
     )
-    text = msg.content[0].text.strip()
+    # Message.content is a union of block kinds and only a text block carries
+    # prose; this prompt enables no tools, so anything else is a wrong answer.
+    block = msg.content[0]
+    if not isinstance(block, TextBlock):
+        raise TypeError(f"expected a text block from the model, got {block.type!r}")
+    text = block.text.strip()
     # Strip markdown fences if the model wrapped it
     if text.startswith("```"):
         text = text.split("```", 2)[1]
-        if text.startswith("json"):
-            text = text[4:]
+        text = text.removeprefix("json")
         text = text.rsplit("```", 1)[0].strip()
     data = json.loads(text)
     return ContentBundle(
