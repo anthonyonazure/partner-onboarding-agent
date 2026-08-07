@@ -9,6 +9,7 @@ from __future__ import annotations
 import secrets
 import uuid
 from pathlib import Path
+from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
@@ -44,7 +45,9 @@ def _base(req: Request) -> str:
 
 
 @app.post("/v1/accounts", response_model=CreateAccountResponse)
-async def create_account(body: CreateAccountRequest, req: Request) -> CreateAccountResponse:
+async def create_account(
+    body: CreateAccountRequest, req: Request
+) -> CreateAccountResponse:
     base = _base(req)
     # Idempotency: same partner_id returns same account
     for acct in _ACCOUNTS.values():
@@ -65,19 +68,27 @@ async def create_account(body: CreateAccountRequest, req: Request) -> CreateAcco
 
 
 @app.post("/v1/accounts/{account_id}/assets")
-async def upload_asset(account_id: str, req: Request, file: UploadFile = File(...)) -> dict:
+async def upload_asset(
+    account_id: str, req: Request, file: Annotated[UploadFile, File()]
+) -> dict:
     if account_id not in _ACCOUNTS:
         raise HTTPException(404, "account not found")
     content = await file.read()
-    safe_name = file.filename.replace("/", "_")
+    # A multipart part is allowed to arrive without a filename.
+    safe_name = (file.filename or "upload.bin").replace("/", "_")
     target = _ASSETS_DIR / f"{account_id}_{safe_name}"
     target.write_bytes(content)
     _ASSETS.setdefault(account_id, []).append(safe_name)
-    return {"url": f"{_base(req)}/assets/{account_id}/{safe_name}", "bytes": len(content)}
+    return {
+        "url": f"{_base(req)}/assets/{account_id}/{safe_name}",
+        "bytes": len(content),
+    }
 
 
 @app.post("/v1/accounts/{account_id}/intake-forms")
-async def create_intake_form(account_id: str, body: IntakeFormRequest, req: Request) -> dict:
+async def create_intake_form(
+    account_id: str, body: IntakeFormRequest, req: Request
+) -> dict:
     if account_id not in _ACCOUNTS:
         raise HTTPException(404, "account not found")
     _INTAKE_FORMS[account_id] = body.fields

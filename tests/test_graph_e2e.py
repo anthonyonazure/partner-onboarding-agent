@@ -35,7 +35,9 @@ async def test_full_onboarding_run(mock_portal_url, monkeypatch):
     assert event_kinds["portal_provisioned"] == 1
     assert event_kinds["content_generated"] == 1
     assert event_kinds["pdf_packet_built"] == 1
-    assert event_kinds["hubspot_note_posted"] == 1, "post-back must fire exactly once (was the bug)"
+    assert event_kinds["hubspot_note_posted"] == 1, (
+        "post-back must fire exactly once (was the bug)"
+    )
 
     # Resources captured in state
     assert final["mailbox_upn"].endswith("@mock.tenant")
@@ -60,7 +62,12 @@ async def test_provisioning_is_idempotent_when_rerun(mock_portal_url, monkeypatc
     """Re-running with the same deal should not blow up; portal account is dedup'd."""
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     graph = build_graph().compile()
-    base: OnboardingState = {"deal_id": "deal-001", "run_id": "x", "events": [], "errors": []}
+    base: OnboardingState = {
+        "deal_id": "deal-001",
+        "run_id": "x",
+        "events": [],
+        "errors": [],
+    }
     a = await graph.ainvoke(base)
     b = await graph.ainvoke(base)
     # Same partner → same portal account id

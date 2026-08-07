@@ -6,12 +6,13 @@ Idempotent where possible: re-running a node should not re-create resources.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast, get_args
 
 import structlog
 from b2b_toolkit import get_adapters
+from b2b_toolkit.models import PartnerTier
 
 from onboarding.content import generate_content_bundle
 from onboarding.pdf import render_welcome_packet
@@ -24,7 +25,19 @@ _OUT.mkdir(exist_ok=True)
 
 
 def _event(kind: str, **detail: Any) -> dict[str, Any]:
-    return {"at": datetime.now(timezone.utc).isoformat(), "kind": kind, **detail}
+    return {"at": datetime.now(UTC).isoformat(), "kind": kind, **detail}
+
+
+def _as_tier(value: object) -> PartnerTier:
+    """Narrow a tier read out of HubSpot to the four the adapters accept.
+
+    HubSpot hands back free-form properties, but Zendesk SLA selection is keyed
+    on the closed set. Rejecting an unknown tier here beats provisioning a
+    partner with a silently wrong support contract.
+    """
+    if value not in get_args(PartnerTier):
+        raise ValueError(f"unknown partner tier {value!r}")
+    return cast(PartnerTier, value)
 
 
 @traced(name="read_partner_profile")
@@ -40,7 +53,7 @@ async def read_partner_profile(state: OnboardingState) -> dict[str, Any]:
         "partner_logo_url": company.get("logo_url"),
         "primary_contact_email": company["primary_contact_email"],
         "primary_contact_name": company["primary_contact_name"],
-        "tier": company.get("tier", "silver"),
+        "tier": _as_tier(company.get("tier", "silver")),
         "region": company.get("region", "NA"),
         "services_purchased": deal.get("services_purchased", []),
         "contract_signed_at": company["contract_signed_at"],
@@ -54,12 +67,21 @@ async def provision_m365(state: OnboardingState) -> dict[str, Any]:
     name = state["partner_name"]
     alias = state["partner_domain"].split(".")[0].lower() + "-partners"
 
-    mailbox = await adapters.m365.create_mailbox(display_name=f"{name} Partners", alias=alias)
-    site = await adapters.m365.create_sharepoint_site(name=f"{name} Workspace", owner_upn=mailbox.upn)
+    mailbox = await adapters.m365.create_mailbox(
+        display_name=f"{name} Partners", alias=alias
+    )
+    site = await adapters.m365.create_sharepoint_site(
+        name=f"{name} Workspace", owner_upn=mailbox.upn
+    )
     planner = await adapters.m365.create_planner_board(
         title=f"{name} Onboarding",
         owner_group_id=site.site_id,
-        buckets=["Week 1: Provisioning", "Week 2: Kickoff", "Week 3: Activation", "Blockers"],
+        buckets=[
+            "Week 1: Provisioning",
+            "Week 2: Kickoff",
+            "Week 3: Activation",
+            "Blockers",
+        ],
     )
     return {
         "mailbox_upn": mailbox.upn,
@@ -78,11 +100,15 @@ async def provision_zendesk(state: OnboardingState) -> dict[str, Any]:
         domain=state["partner_domain"],
         tier=state["tier"],
     )
-    sla_id = await adapters.zendesk.attach_sla_policy(org_id=org.organization_id, tier=state["tier"])
+    sla_id = await adapters.zendesk.attach_sla_policy(
+        org_id=org.organization_id, tier=state["tier"]
+    )
     return {
         "zendesk_org_id": org.organization_id,
         "zendesk_sla_id": sla_id,
-        "events": [_event("zendesk_provisioned", org_id=org.organization_id, sla=sla_id)],
+        "events": [
+            _event("zendesk_provisioned", org_id=org.organization_id, sla=sla_id)
+        ],
     }
 
 
@@ -145,15 +171,21 @@ async def build_pdf_packet(state: OnboardingState) -> dict[str, Any]:
     out_path.write_bytes(pdf_bytes)
 
     adapters = get_adapters()
+    portal_account_id = state.get("portal_account_id")
+    if portal_account_id is None:
+        raise RuntimeError(
+            "the portal account must be provisioned before the packet upload"
+        )
     url = await adapters.portal.upload_co_branded_asset(
-        account_id=state["portal_account_id"],
+        account_id=portal_account_id,
         filename=out_path.name,
         content=pdf_bytes,
     )
     # Also drop into SharePoint
-    if state.get("sharepoint_site_id"):
+    sharepoint_site_id = state.get("sharepoint_site_id")
+    if sharepoint_site_id:
         await adapters.m365.upload_file(
-            site_id=state["sharepoint_site_id"],
+            site_id=sharepoint_site_id,
             path=f"/Shared Documents/{out_path.name}",
             content=pdf_bytes,
         )

@@ -6,7 +6,6 @@ before enqueueing. The portfolio version skips that for clarity.
 
 from __future__ import annotations
 
-import asyncio
 import uuid
 from typing import Any
 
@@ -41,7 +40,12 @@ async def deal_stage_changed(req: Request, bg: BackgroundTasks) -> dict[str, Any
 
 
 async def _run_onboarding(deal_id: str, run_id: str) -> None:
-    initial: OnboardingState = {"deal_id": deal_id, "run_id": run_id, "events": [], "errors": []}
+    initial: OnboardingState = {
+        "deal_id": deal_id,
+        "run_id": run_id,
+        "events": [],
+        "errors": [],
+    }
     graph = build_graph().compile()
     try:
         await graph.ainvoke(initial)

@@ -15,6 +15,9 @@ async def test_stub_bundle_when_no_api_key():
         services=["managed-soc"],
     )
     assert len(bundle.email_sequence) == 5
-    assert all({"day_offset", "subject", "body", "purpose"} <= e.keys() for e in bundle.email_sequence)
+    assert all(
+        {"day_offset", "subject", "body", "purpose"} <= e.keys()
+        for e in bundle.email_sequence
+    )
     assert "Kickoff Call" in bundle.kickoff_agenda
     assert 8 <= len(bundle.readiness_checklist) <= 12
