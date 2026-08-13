@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 license = { text = "MIT" }
 
 dependencies = [
-    "b2b-agent-toolkit",
+    "b2b-agent-toolkit @ git+https://github.com/anthonyonazure/b2b-agent-toolkit@main",
     "langgraph>=0.2.40",
     "langgraph-checkpoint-sqlite>=2.0",
     "langchain-anthropic>=0.2",
